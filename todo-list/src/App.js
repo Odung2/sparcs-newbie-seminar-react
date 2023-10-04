@@ -8,6 +8,7 @@ function App() {
   const [content, setContent] = useState('');
   const [deadline, setDeadline] = useState('');
   const [sort, setSort] = useState('unsorted');
+  const [filter, setFilter] = useState('no filter');
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
@@ -24,7 +25,11 @@ function App() {
   };
 
   const handleSortChange = (e) => {
-    setSort(e.target.value)
+    setSort(e.target.value);
+  }
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
   }
 
   const handleAddTodo = () => {
@@ -55,15 +60,20 @@ function App() {
     setTodos(newTodos);
   };
 
-  const sortedTodos = todos.slice().sort((a, b) => {
+  const sortedAndFilteredTodos = todos.slice().filter((todo) => {
+    if (filter === 'no filter' || filter === todo.priority) {
+      return true;
+    }
+    return false;
+  }).sort((a, b) => {
     if (sort === 'sorted') {
       // 'sorted' 옵션일 때 중요도(priority)로 정렬
       return a.priority.localeCompare(b.priority);
-    } else {
-      // 'unsorted' 옵션일 때 순서를 그대로 유지
-      return 0;
     }
+    // 'unsorted' 옵션일 때 순서를 그대로 유지
+    return 0;
   });
+
 
   return (
     <div className="App">
@@ -72,6 +82,14 @@ function App() {
         <select value={sort} onChange={handleSortChange}>
           <option value = "sorted">sorted</option>
           <option value = "unsorted">unsorted</option>
+        </select>
+      </div>
+      <div className="filterlist">
+        <select value={filter} onChange={handleFilterChange}>
+          <option value="no filter">전체</option>
+          <option value="높음">높음</option>
+          <option value="중간">중간</option>
+          <option value="낮음">낮음</option>
         </select>
       </div>
       
@@ -103,7 +121,7 @@ function App() {
 
       </div>
       <ul className="todo-list">
-        {sortedTodos.map((todo, index) => (
+        {sortedAndFilteredTodos.map((todo, index) => (
           <li key={index}>
             <strong>{todo.title}</strong>
             <p>중요도: {todo.priority}</p>
